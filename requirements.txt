@@ -1,0 +1,3 @@
+pywxdump
+PyQt5
+requests
