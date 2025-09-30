@@ -112,3 +112,34 @@ def get_all_data(user_info):
         chathistory_result = f"读取聊天记录时出错：{e}"
 
     return contacts_result, chathistory_result
+
+
+def get_users_from_path(path):
+    """
+    从给定的 "WeChat Files" 文件夹路径中扫描历史用户。
+    :param path: "WeChat Files" 文件夹的完整路径。
+    :return: 成功时返回用户列表(list of dicts)，失败时返回错误信息(str)。
+    """
+    if not os.path.isdir(path):
+        return f"错误：提供的路径 '{path}' 不是一个有效的文件夹。"
+
+    users = []
+    try:
+        for item_name in os.listdir(path):
+            # 微信用户文件夹通常以 "wxid_" 开头
+            if item_name.startswith('wxid_'):
+                item_path = os.path.join(path, item_name)
+                # 确保它是一个文件夹
+                if os.path.isdir(item_path):
+                    user_info = {
+                        'wxid': item_name,
+                        'path': path  # 'path' 是 'WeChat Files' 的路径
+                    }
+                    users.append(user_info)
+
+        if not users:
+            return "错误：在指定路径下未找到任何 'wxid_' 开头的用户文件夹。"
+
+        return users
+    except Exception as e:
+        return f"扫描文件夹时发生错误：{e}"

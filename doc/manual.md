@@ -1,6 +1,6 @@
 # WeChat History Viewer - User Manual
 
-This is a Windows desktop application for viewing WeChat chat history locally.
+This is a Windows desktop application for viewing WeChat chat history locally. This guide explains the new dual-mode loading system for a better user experience.
 
 ## 1. Environment Preparation
 
@@ -10,39 +10,42 @@ Before running this program, please ensure that you have a Python environment in
     Download all project files to any location on your computer.
 
 2.  **Install Dependencies**
-    Open a command-line tool (CMD or PowerShell), navigate to the project's root directory, and run the following command to install all necessary third-party libraries:
+    Open a command-line tool (CMD or PowerShell), navigate to the project's root directory, and run the following command:
     ```bash
     pip install -r requirements.txt
     ```
-    This command will automatically install `pywxdump`, `PyQt5`, and `requests`.
 
-## 2. How to Run the Program
+## 2. How to Run and Use the Program
 
-1.  **Log in to WeChat on PC**
-    Please ensure that the WeChat account you want to view is **currently running and logged in** on your Windows PC. This is a critical step as the program needs to read information from the running WeChat process.
+The program now offers two ways to load user data: **Automatic Online Loading** and **Manual Path Selection**.
 
-2.  **Start the Program**
-    In the project's root directory, right-click and choose "Run as administrator" if possible, then run the `main.py` file from the command line:
-    ```bash
-    python main.py
-    ```
+### Method 1: Automatic Online Loading (Recommended)
 
-3.  **Using the Application**
-    a. The main window will be displayed after the program starts.
-    b. Click the **"1. 点击加载已登录的微信用户"** button.
-    c. The program will attempt to automatically find all logged-in WeChat accounts and display them in the list.
-    d. Double-click the account you want to view to enter the chat history interface.
-    e. In the chat interface, the left side is the contact list (with search support), and the right side is the chat history with that contact.
+This is the easiest way to view the chat history of a currently logged-in account.
+
+1.  **Log in to WeChat on PC**: Ensure the WeChat account you want to view is **running and logged in**.
+2.  **Start the Application**: Run `python main.py` from the project's root directory (preferably with administrator rights).
+3.  **Click "自动加载在线用户" (Auto-load Online Users)**: The program will try to detect all logged-in accounts.
+    *   **On Success**: A list of online users will appear (e.g., "在线用户: John Doe"). Double-click a user to open their chat history.
+    *   **On Failure**: An error message will appear (see Troubleshooting section). The "手动选择路径" (Manual Path Selection) button will now become active, allowing you to proceed to Method 2.
+
+### Method 2: Manual Path Selection (Fallback)
+
+Use this method if auto-loading fails or if you want to view the history of an account that is not currently logged in.
+
+1.  **Activate the Button**: This button is only active after the automatic loading has failed.
+2.  **Click "手动选择路径" (Manual Path Selection)**: An "open folder" dialog will appear.
+3.  **Select "WeChat Files" Folder**: Navigate to and select your `WeChat Files` folder. Its typical location is `C:\Users\YourUsername\Documents\WeChat Files`.
+4.  **View Historical Users**: The program will list all user accounts that have ever been used on this computer (e.g., "历史用户: wxid_12345...").
+5.  **Double-click a User to Decrypt**:
+    *   A pop-up will appear, asking you to **log in to the corresponding WeChat account** (the one matching the `wxid_...` you just clicked). This step is necessary to get the decryption key from the live process.
+    *   After you have logged in, click the **"我已登录" (I have logged in)** button.
+    *   The program will then re-scan the online users, find the key for the account you logged into, and open the chat history.
 
 ## 3. How to Package as an .exe File
 
-If you want to run this program on a computer without a Python environment, you can package it into a single `.exe` file. We recommend using the `PyInstaller` tool.
-
-1.  **Install PyInstaller**
-    In the command line, run: `pip install pyinstaller`
-
-2.  **Execute the Packaging Command**
-    In the project's root directory, run the following command:
+1.  **Install PyInstaller**: `pip install pyinstaller`
+2.  **Execute Packaging Command**: In the project's root directory, run:
     ```bash
     pyinstaller --onefile --windowed --name WeChatHistoryViewer main.py
     ```
@@ -50,26 +53,13 @@ If you want to run this program on a computer without a Python environment, you 
 
 ## 4. Troubleshooting / Common Issues
 
-You may encounter някои error messages. Here is how to interpret and solve them:
-
-*   **Error: "未找到任何登录的微信用户" (No logged-in WeChat user found)**
-    *   **Cause**: The program could not detect a running WeChat process.
-    *   **Solution**: Make sure your WeChat desktop client is running and you are logged in *before* you click the "加载用户" button.
-
-*   **Error: "获取用户信息时发生未知错误" (Unknown error while getting user info)**
-    *   **Cause**: This is a general error that can have several causes.
+*   **Error on "自动加载在线用户"**:
+    *   **Cause**: The program could not detect a running WeChat process or lacked permissions.
     *   **Solutions**:
-        1.  **Run as Administrator**: The most common solution. The program needs high-level permissions to read memory from another process. Close the application, then right-click your command prompt or the `.exe` file and select "Run as administrator".
-        2.  **WeChat/pywxdump Version Incompatibility**: The `pywxdump` library may not support the very latest version of WeChat. If running as admin doesn't work, this might be the issue. You can check the official `pywxdump` GitHub page for information on supported versions.
-        3.  **Antivirus Software**: Your antivirus might be blocking the program from accessing WeChat's memory.
+        1.  **Run as Administrator**: This is the most common fix.
+        2.  **Ensure WeChat is Logged In**: Double-check that WeChat is running.
+        3.  **Antivirus/Version Issues**: Your antivirus might be blocking the program, or your WeChat version might be too new for the `pywxdump` library.
 
-*   **Error: "核心库 'pywxdump' 未安装" (Core library 'pywxdump' not installed)**
-    *   **Cause**: The main dependency is missing.
-    *   **Solution**: Run `pip install -r requirements.txt` in the project's root directory.
-
-*   **Antivirus Warnings**
-    *   **Cause**: The `pywxdump` library works by reading the WeChat process memory to obtain the decryption key. This behavior is similar to how some malware operates, so security software may flag it as suspicious.
-    *   **Solution**: This is expected behavior for this type of tool. Please "allow" or "trust" the program in your antivirus software. The code for this project is fully visible and does not contain any malicious behavior.
-
----
-If you continue to experience issues, please ensure you have the latest version of this program and the libraries mentioned in `requirements.txt`.
+*   **Manual Mode: "无法在当前登录的账号中找到 ... 的密钥" (Could not find the key in the currently logged-in account)**
+    *   **Cause**: You double-clicked a historical user (`wxid_...`) but then logged into a *different* WeChat account.
+    *   **Solution**: Make sure you log into the exact account that corresponds to the `wxid_...` you are trying to view. The program needs to match them to get the correct key.
